@@ -1,0 +1,442 @@
+What Actually Happens Internally?
+When you create a database:
+MySQL creates a separate storage container
+Metadata is registered internally
+Tables created later belong to this database
+
+CATEGORY 1 — Numeric Data Types
+1. TINYINT
+Storage:
+
+1 byte
+
+Signed Range:
+
+-128 to 127
+Unsigned Range:
+
+0 to 255
+Example Use:
+
+Age
+
+Boolean flags
+
+Ratings
+
+Example:
+
+age TINYINT UNSIGNED
+Meaning:
+
+Cannot store negative age
+
+Saves memory
+
+Signed vs Unsigned (CRITICAL)
+By default:
+
+INT
+is SIGNED.
+
+Meaning:
+
+Negative + Positive allowed
+Example:
+
+-2147483648 to 2147483647
+But:
+
+INT UNSIGNED
+becomes:
+
+0 to 4294967295
+Why?
+
+Because space used for negative numbers is reassigned to positive range.
+
+Real-World Insight
+Use UNSIGNED when negative values are logically impossible.
+
+Examples:
+
+Age
+
+Quantity
+
+Salary
+
+IDs
+
+Product stock
+
+Numeric Type Storage Table
+Type	Storage	Signed Range	Unsigned Range
+TINYINT	1 byte	-128 to 127	0 to 255
+SMALLINT	2 bytes	-32,768 to 32,767	0 to 65,535
+MEDIUMINT	3 bytes	-8M to 8M	0 to 16M
+INT	4 bytes	-2.1B to 2.1B	0 to 4.2B
+BIGINT	8 bytes	Huge	Very Huge
+Exam Pitfall #2 — Wrong Integer Selection
+Students use:
+
+INT
+for everything.
+
+But real design matters.
+
+Example:
+
+Bad:
+
+rating INT
+Better:
+
+rating TINYINT UNSIGNED
+Why waste 4 bytes when rating is only 1–5?
+
+In large-scale systems:
+
+millions of rows
+
+storage optimization matters massively
+
+CATEGORY 2 — FLOAT vs DOUBLE vs DECIMAL
+This is EXTREMELY important for interviews and assessments.
+
+FLOAT
+Approximate decimal storage.
+
+Not fully precise.
+
+Example:
+
+price FLOAT
+Issue:
+
+10.2 may internally become 10.199999
+Why?
+Binary floating-point approximation.
+
+Used for:
+
+scientific calculations
+
+sensor data
+
+measurements
+
+NOT ideal for money.
+
+DOUBLE
+Same concept but higher precision.
+
+Still approximate.
+
+DECIMAL (VERY IMPORTANT)
+Exact precision storage.
+
+Syntax:
+
+DECIMAL(total_digits, digits_after_decimal)
+Example:
+
+salary DECIMAL(10,2)
+Meaning:
+
+Total digits = 10
+
+Decimal digits = 2
+
+Allowed:
+
+99999999.99
+CRITICAL INTERVIEW / EXAM QUESTION
+Why is DECIMAL preferred for financial systems?
+
+Because:
+
+FLOAT introduces rounding errors
+
+DECIMAL stores exact values
+
+Banking systems NEVER use FLOAT for money.
+
+CATEGORY 3 — Character Data Types
+CHAR
+Fixed-length storage.
+
+Example:
+
+CHAR(5)
+If you store:
+
+A
+Internally:
+
+A____
+(padded with spaces)
+
+VARCHAR
+Variable-length storage.
+
+Example:
+
+VARCHAR(5)
+If you store:
+
+A
+Only 1 character stored.
+
+Efficient for varying data.
+
+CHAR vs VARCHAR
+Feature	CHAR	VARCHAR
+Length	Fixed	Variable
+Speed	Slightly faster	Slightly slower
+Space	Wastes extra	Efficient
+Good For	Fixed values	Dynamic text
+Real-World Examples
+Use CHAR for:
+
+Gender (M/F)
+
+Country Code (IN)
+
+PAN prefixes
+
+Fixed-size hashes
+
+Use VARCHAR for:
+
+Names
+
+Emails
+
+Addresses
+
+Exam Pitfall #3
+Students use:
+
+CHAR(255)
+for names.
+
+Terrible design.
+
+Because:
+
+huge wasted space
+
+slower large-scale storage
+
+CATEGORY 4 — DATE vs DATETIME vs TIMESTAMP
+DATE
+Stores only:
+
+YYYY-MM-DD
+Example:
+
+dob DATE
+DATETIME
+Stores:
+
+YYYY-MM-DD HH:MM:SS
+Range:
+
+1000 to 9999
+TIMESTAMP
+Also stores date + time.
+
+But:
+
+internally linked to Unix timestamp
+
+timezone-aware
+
+smaller range
+
+Very commonly used for:
+
+created_at TIMESTAMP
+Important Difference
+DATETIME	TIMESTAMP
+Larger range	Smaller range
+No timezone conversion	Timezone-aware
+More storage	Less storage
+Real Industry Usage
+Use:
+
+DATE → birthdays
+
+DATETIME → meeting schedule
+
+TIMESTAMP → system logs, audit tracking
+
+CATEGORY 5 — NULLABILITY
+By default:
+
+name VARCHAR(50)
+means:
+
+NULL allowed
+Meaning:
+
+value may be missing
+
+NOT NULL
+Example:
+
+name VARCHAR(50) NOT NULL
+Now insertion without value fails.
+
+Real-World Importance
+Critical fields should NEVER be nullable:
+
+primary identifiers
+
+usernames
+
+passwords
+
+essential transaction fields
+
+CATEGORY 6 — AUTO_INCREMENT
+Automatically generates sequential values.
+
+Example:
+
+emp_id INT AUTO_INCREMENT PRIMARY KEY
+Insert:
+
+INSERT INTO employee(name)
+VALUES('Rahul');
+MySQL automatically generates:
+
+1
+2
+3
+4
+...
+Important Rule
+AUTO_INCREMENT usually works with:
+
+PRIMARY KEY
+
+Numeric types
+
+Exam Pitfall #4
+Students manually insert IDs while using AUTO_INCREMENT.
+
+Can create:
+
+duplicate issues
+
+sequence mismatch
+
+CATEGORY 7 — ZEROFILL (Legacy but Exam-Relevant)
+Example:
+
+invoice_no INT(5) ZEROFILL
+Stored:
+
+25
+Displayed:
+
+00025
+Used mostly for formatting display.
+
+But Important Modern Note
+ZEROFILL is considered outdated in newer MySQL designs.
+
+Formatting is now usually handled in application code.
+
+Still important for exams.
+
+MINI ARCHITECTURE EXAMPLE
+Bad Design:
+
+CREATE TABLE employee(
+    id INT,
+    name CHAR(200),
+    salary FLOAT,
+    age INT
+);
+Problems:
+
+no PK
+
+CHAR wastes memory
+
+FLOAT unsafe for money
+
+age unnecessarily large
+
+Better Design:
+
+CREATE TABLE employee(
+    emp_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    salary DECIMAL(10,2) NOT NULL,
+    age TINYINT UNSIGNED,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+This looks like real industry-level design.
+
+Cognizant Assessment Mindset
+They often test:
+
+choosing correct datatype
+
+avoiding logical inconsistency
+
+identifying range overflow
+
+selecting exact precision
+
+recognizing NULL constraint violations
+
+Not just syntax.
+
+THEORY CHECK — Answer Without Guessing
+Question 1
+Why is DECIMAL(10,2) preferred over FLOAT for storing employee salaries in enterprise systems?
+
+Explain architecturally, not just “because it is precise.”
+
+Question 2
+Suppose a table stores:
+
+Student age
+
+Values only from 0–120
+
+Negative values impossible
+
+Which datatype would you choose and why?
+Also explain why using regular INT is inefficient here.
+
+Answer these first.
+After that, I will evaluate your understanding and then move you into your first Cognizant-style practical schema design exercise.
+
+ENUM : A string object with a value choose from a list of permitted values 
+gender 
+
+Keys Type:--
+PRIMARY KEY
+UNIQUE KEY
+FOREIGN KEY
+CANDIDATE KEY
+COMPOSITE KEY
+SURROGATE KEYA 
+
+PRIMARY KEY:
+    uniquely identifies every row.
+Properties:
+    UNIQUE
+    NOT NULL
+    Only ONE primary key per table
+
+You can use ALTER Table to modify an existing table.
+ALTER TABLE _______ ADD COLUMN ________ Column Data type Constraints
+
+

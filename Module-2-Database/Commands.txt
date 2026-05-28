@@ -1,0 +1,78 @@
+CREATE DATABASE ___________
+
+USE ___________
+
+CREATE TABLE ___________
+
+SELECT _____ FROM ___________
+SELECT * FROM ___________
+* --> All
+
+SHOW DATABASES
+
+DROP DATABASE ___________
+
+
+
+DATATYPES
+1. TINYINT --> 1 Byte, SIGNED -128 TO 127, UNISIGNED 0 to 455
+2. SMALLINT --> 2 Byte, SIGNED -32,768 to 32,767, UNSIGNED 0 TO 65,535
+    Million = 10 Lakhs
+3. MEDIUMINT --> 3 Byte,SIGNED -8M TO 8M, UNSIGEND 0 TO 16M
+    1 Billion = 100 Crores = 1000 Million
+4. INT ---> 4 Byte, SIGNED -2.1B TO 2.1B, UNSIGNED 0 to 4.2B
+5. BIGINT ---> 8 Bytes, SIGNED HUGE, UNSIGNED Very Huge
+
+FLOAT --> Approximate Decimal Storage
+DOUBLE --> Better than Float, still not precise
+DECIMAL --> EXACT Prcision Storage
+
+CHAR --> Fixed Legth, Padded Space
+VARCHAR --> Variable, Slower
+
+DATE --> YYYY-MM-DD
+DATETIME --> YYYY-MM-DD HH:MM:SS
+
+created_at TIMESTAMP
+created_at CURRENT_TIMESTAMP
+
+AUTO_INCREMENT
+
+UNIQUE
+
+NOT_NULL
+
+DEFAULT
+
+ENUM('Male', 'Female', 'Other')
+
+Comments
+1. -- --> Single Line Comments
+2. /* */ --> Multi Line Comments
+
+ALTER TABLE _________ MODIFY COLUMN column_name cloumn_data_type AFTER second_column_name
+
+ALTER TABLE users MODIFY COLUMN date_of_birth FIRST
+
+INSERT INTO table_name VALUES
+()
+
+<>, != --> NOT EQUAL TO 
+
+SELECT column_name FROM ______ WHERE column_name - 
+
+SELECT * FROM _______ WHERE cloumn_name in ()
+
+ASC ---> Ascending Order
+DESC ---> Descending Order
+
+LIMIT
+
+OR
+
+AND
+
+UPDATE table_name SET column_name ####### <-- This will update the given in the whole table.
+UPDATE table_name SET column_name = ########, Another Query
+
+ADD CONSTRAINT column_name constrain 
